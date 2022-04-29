@@ -29,6 +29,7 @@ def doit():
     # Set variables
     project_id="reliable-cairn-685"
     zone_name="joaofelipe"
+    DNSEntry="sample.mydomain.net."
     cred_file_path='C:\\MyGarbage\\WebProjects\\update-gcloud-dns\\sandbox\\gcloud.json' 
 
     # Get remote IP address
@@ -44,18 +45,18 @@ def doit():
     service = discovery.build('dns', 'v1', credentials=credentials)
 
     # Get the current IP of the register
-    # currentip = socket.gethostbyname('hass.joaofelipe.net') # does not work
+    # currentip = socket.gethostbyname(DNSEntry) # does not work
     querydns = service.resourceRecordSets().list(project=project_id, managedZone=zone_name)
     dnsresponse = querydns.execute()
     for record in dnsresponse['rrsets']:   
-      if record['name'] == 'hass.joaofelipe.net.':
+      if record['name'] == DNSEntry:
         currentip = record['rrdatas'][0]
 
     # Set body to change
     change_body = {
         "deletions": [
             {
-              "name": "hass.joaofelipe.net.",
+              "name": DNSEntry,
               "type": "A",
               "ttl": 120,
               "rrdata": [currentip],
@@ -64,7 +65,7 @@ def doit():
         ],
         "additions": [
             {
-        "name": "hass.joaofelipe.net.",
+        "name": DNSEntry,
         "type": "A",
         "ttl": 120,
         "rrdata": [remoteip]
